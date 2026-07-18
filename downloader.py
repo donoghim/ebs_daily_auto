@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 AUSCHOOL_URL = os.environ.get('AUSCHOOL_URL', 'https://5dang.ebs.co.kr/auschool/sub/language?clsfnSystId1=47140032%3E47140033')
 EBS_USERNAME = os.environ.get('EBS_USERNAME')
 EBS_PASSWORD = os.environ.get('EBS_PASSWORD')
-GCP_SA_KEY = os.environ.get('GCP_SA_KEY')
 GDRIVE_FOLDER_ID = os.environ.get('GDRIVE_FOLDER_ID')
 
 # When running in GitHub Actions, the system time is UTC. We want to operate on KST weekdays.
@@ -96,13 +95,23 @@ def download_file(session: requests.Session, url: str, dest: pathlib.Path):
                     f.write(chunk)
 
 
-def upload_to_drive(filepath: pathlib.Path, folder_id: str, credentials_json: dict):
+def upload_to_drive(filepath: pathlib.Path, folder_id: str, client_id: str, client_secret: str, refresh_token: str):
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
+
     scopes = ['https://www.googleapis.com/auth/drive.file']
-    # extract client email (for helpful logging)
-    client_email = credentials_json.get('client_email') if isinstance(credentials_json, dict) else None
     try:
-        credentials = service_account.Credentials.from_service_account_info(credentials_json, scopes=scopes)
-        service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
+        creds = Credentials(
+            token=None,
+            refresh_token=refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=client_id,
+            client_secret=client_secret,
+            scopes=scopes
+        )
+        # Refresh access token
+        creds.refresh(Request())
+        service = build('drive', 'v3', credentials=creds, cache_discovery=False)
     except Exception as e:
         logger.error('Failed to build Drive service: %s', e)
         raise
@@ -113,16 +122,7 @@ def upload_to_drive(filepath: pathlib.Path, folder_id: str, credentials_json: di
 
     media = MediaFileUpload(str(filepath), mimetype='audio/m4a')
 
-    # mask client email for logs
-    masked_email = None
-    if client_email:
-        try:
-            local, domain = client_email.split('@', 1)
-            masked_email = f"{local[0]}***@{domain}"
-        except Exception:
-            masked_email = '***'
-
-    logger.info('Uploading %s to Drive folder %s (service account: %s)', filepath.name, folder_id, masked_email)
+    logger.info('Uploading %s to Drive folder %s (OAuth user authentication)', filepath.name, folder_id)
 
     try:
         # supportsAllDrives helps when the target is a Shared Drive
@@ -130,14 +130,7 @@ def upload_to_drive(filepath: pathlib.Path, folder_id: str, credentials_json: di
         logger.info('Uploaded file id: %s', created.get('id'))
         return created.get('id')
     except Exception as e:
-        try:
-            from googleapiclient.errors import HttpError
-            if isinstance(e, HttpError) and getattr(e, 'resp', None) and getattr(e.resp, 'status', None) == 404:
-                logger.error('Upload failed %s: Folder not found or inaccessible. Folder id: %s. Ensure the folder exists and is shared with the service account (%s).', filepath.name, folder_id, masked_email)
-            else:
-                logger.error('Upload failed %s: %s', filepath.name, e)
-        except Exception:
-            logger.error('Upload failed %s: %s', filepath.name, e)
+        logger.error('Upload failed %s: %s', filepath.name, e)
         raise
 
 
@@ -178,19 +171,17 @@ def main():
             logger.error('No files downloaded.')
             sys.exit(3)
 
-        if not GCP_SA_KEY or not GDRIVE_FOLDER_ID:
-            logger.error('GCP_SA_KEY or GDRIVE_FOLDER_ID not set in env; cannot upload.')
-            sys.exit(4)
+        GCP_CLIENT_ID = os.environ.get('GCP_CLIENT_ID')
+        GCP_CLIENT_SECRET = os.environ.get('GCP_CLIENT_SECRET')
+        GCP_REFRESH_TOKEN = os.environ.get('GCP_REFRESH_TOKEN')
 
-        try:
-            credentials_json = json.loads(GCP_SA_KEY)
-        except Exception as e:
-            logger.error('Failed to parse GCP_SA_KEY JSON: %s', e)
-            sys.exit(5)
+        if not (GCP_CLIENT_ID and GCP_CLIENT_SECRET and GCP_REFRESH_TOKEN) or not GDRIVE_FOLDER_ID:
+            logger.error('GCP OAuth credentials or GDRIVE_FOLDER_ID not set in env; cannot upload.')
+            sys.exit(4)
 
         for fpath in downloaded:
             try:
-                upload_to_drive(fpath, GDRIVE_FOLDER_ID, credentials_json)
+                upload_to_drive(fpath, GDRIVE_FOLDER_ID, GCP_CLIENT_ID, GCP_CLIENT_SECRET, GCP_REFRESH_TOKEN)
             except Exception as e:
                 logger.error('Upload failed for %s: %s', fpath.name, e)
 

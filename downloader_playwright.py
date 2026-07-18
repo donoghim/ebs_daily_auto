@@ -19,7 +19,6 @@ from downloader import upload_to_drive
 AUSCHOOL_URL = os.environ.get('AUSCHOOL_URL') or 'https://5dang.ebs.co.kr/auschool/sub/language?clsfnSystId1=47140032%3E47140033'
 EBS_USERNAME = os.environ.get('EBS_USERNAME')
 EBS_PASSWORD = os.environ.get('EBS_PASSWORD')
-GCP_SA_KEY = os.environ.get('GCP_SA_KEY')
 GDRIVE_FOLDER_ID = os.environ.get('GDRIVE_FOLDER_ID')
 DEBUG_PLAYWRIGHT = os.environ.get('DEBUG_PLAYWRIGHT')
 DEBUG_SLOWMO = os.environ.get('DEBUG_SLOWMO')
@@ -469,19 +468,17 @@ def main():
                 logger.info('SKIP_UPLOAD is set; skipping upload step')
                 return
 
-            if not GCP_SA_KEY or not GDRIVE_FOLDER_ID:
-                logger.error('GCP_SA_KEY or GDRIVE_FOLDER_ID not set; skipping upload')
-                return
+            GCP_CLIENT_ID = os.environ.get('GCP_CLIENT_ID')
+            GCP_CLIENT_SECRET = os.environ.get('GCP_CLIENT_SECRET')
+            GCP_REFRESH_TOKEN = os.environ.get('GCP_REFRESH_TOKEN')
 
-            try:
-                credentials_json = json.loads(GCP_SA_KEY)
-            except Exception as e:
-                logger.error('Invalid GCP_SA_KEY JSON: %s', e)
-                sys.exit(5)
+            if not (GCP_CLIENT_ID and GCP_CLIENT_SECRET and GCP_REFRESH_TOKEN) or not GDRIVE_FOLDER_ID:
+                logger.error('GCP OAuth credentials or GDRIVE_FOLDER_ID not set; skipping upload')
+                return
 
             for fpath in downloaded:
                 try:
-                    upload_to_drive(fpath, GDRIVE_FOLDER_ID, credentials_json)
+                    upload_to_drive(fpath, GDRIVE_FOLDER_ID, GCP_CLIENT_ID, GCP_CLIENT_SECRET, GCP_REFRESH_TOKEN)
                 except Exception as e:
                     logger.error('Upload failed %s: %s', fpath.name, e)
 
