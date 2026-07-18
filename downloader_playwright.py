@@ -342,7 +342,7 @@ def main():
                     try:
                         txt = sc.inner_text()
                         if '.m4a' in txt:
-                            for m in re.findall(r'https?://[^"\'\s]+\.m4a[^"\s]*', txt):
+                            for m in re.findall(r'https?://[^"\'\s]+\.m4a[^"\'\s]*', txt):
                                 if 'end=180' not in m and not any(x['url']==m for x in links):
                                     links.append({'url': m, 'referer': page.url})
                     except Exception:
@@ -409,7 +409,7 @@ def main():
             for item in to_download:
                 if downloaded:
                     break
-                url = item['url']
+                url = item['url'].strip("'\"")
                 referer = item.get('referer') or 'https://5dang.ebs.co.kr/'
                 fname = url.split('/')[-1].split('?')[0]
                 dest = tdpath / fname
