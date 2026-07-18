@@ -366,7 +366,7 @@ def main():
                         try:
                             logger.info('Attempting in-page fetch fallback for %s', url)
                             b64 = page.evaluate(
-                                '''(url, headers) => fetch(url, {method:'GET', headers: headers, credentials:'include'})
+                                '''(args) => fetch(args.url, {method:'GET', headers: args.headers, credentials:'include'})
                                     .then(r => { if(!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.arrayBuffer(); })
                                     .then(buf => {
                                         const bytes = new Uint8Array(buf);
@@ -377,7 +377,7 @@ def main():
                                         }
                                         return btoa(binary);
                                     })''',
-                                url, headers
+                                {'url': url, 'headers': headers}
                             )
                             import base64
                             content = base64.b64decode(b64)
