@@ -104,6 +104,11 @@ def attempt_login(page):
                 page.keyboard.press('Enter')
                 page.wait_for_timeout(3000)
                 logger.info('Submitted login form on %s', lu)
+                # Recover to AUSCHOOL after successful attempt
+                try:
+                    page.goto(AUSCHOOL_URL, wait_until='domcontentloaded', timeout=15000)
+                except Exception:
+                    pass
                 return
             except Exception:
                 continue
@@ -132,6 +137,13 @@ def attempt_login(page):
             logger.info('Attempted modal login')
     except Exception:
         logger.debug('Fallback login attempt failed')
+    
+    # Final recovery: ensure we're on AUSCHOOL_URL and wait for stable state
+    try:
+        if AUSCHOOL_URL not in page.url:
+            page.goto(AUSCHOOL_URL, wait_until='domcontentloaded', timeout=10000)
+    except Exception:
+        pass
 
 
 def main():
@@ -186,18 +198,27 @@ def main():
         if not replay_hrefs:
             logger.info('No replay links found on page; attempting login flow')
             attempt_login(page)
+            # Recover page state after login attempt
+            try:
+                page.wait_for_load_state('networkidle', timeout=10000)
+            except Exception:
+                logger.debug('Page load state wait timed out after login')
             try:
                 page.goto(AUSCHOOL_URL, wait_until='networkidle', timeout=20000)
             except Exception:
-                pass
-            anchors = page.query_selector_all('a[href*="/auschool/sub/replay"]')
-            for a in anchors:
-                try:
-                    href = a.get_attribute('href')
-                    if href and href not in replay_hrefs:
-                        replay_hrefs.append(href)
-                except Exception:
-                    continue
+                logger.debug('Failed to re-navigate to AUSCHOOL_URL')
+            # Safely query with exception handling
+            try:
+                anchors = page.query_selector_all('a[href*="/auschool/sub/replay"]')
+                for a in anchors:
+                    try:
+                        href = a.get_attribute('href')
+                        if href and href not in replay_hrefs:
+                            replay_hrefs.append(href)
+                    except Exception:
+                        continue
+            except Exception as e:
+                logger.debug('Failed to query replay links after login: %s', e)
 
         if not replay_hrefs:
             logger.error('No replay links found after attempts.')
