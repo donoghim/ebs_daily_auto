@@ -413,23 +413,35 @@ def main():
                 referer = item.get('referer') or 'https://5dang.ebs.co.kr/'
                 fname = url.split('/')[-1].split('?')[0]
                 dest = tdpath / fname
+                # Define headers for fallback requests
                 try:
-                    logger.info('Downloading %s via Playwright request', url)
-                    # use Playwright's request API (shares browser context/cookies)
                     ua = page.evaluate('() => navigator.userAgent')
-                    headers = {
-                        'Referer': referer,
-                        'User-Agent': ua,
-                        'Range': 'bytes=0-',
-                        'Accept-Encoding': 'identity;q=1, *;q=0',
-                    }
-                    resp = page.request.get(url, headers=headers, timeout=60000)
-                    if resp.status not in (200, 206):
-                        raise Exception(f'{resp.status} {resp.status_text}')
-                    content = resp.body()
-                    with open(dest, 'wb') as f:
-                        f.write(content)
+                except Exception:
+                    ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0 Safari/537.36'
+                headers = {
+                    'Referer': referer,
+                    'User-Agent': ua,
+                    'Range': 'bytes=0-',
+                    'Accept-Encoding': 'identity;q=1, *;q=0',
+                }
+
+                try:
+                    logger.info('Downloading %s via Browser Native Downloader', url)
+                    with page.expect_download(timeout=60000) as download_info:
+                        page.evaluate('''
+                            (args) => {
+                                const a = document.createElement('a');
+                                a.href = args.url;
+                                a.download = args.fname;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                            }
+                        ''', {'url': url, 'fname': fname})
+                    download = download_info.value
+                    download.save_as(str(dest))
                     downloaded.append(dest)
+                    logger.info('Browser Native Download succeeded for %s', url)
                 except Exception as e:
                     logger.warning('Playwright download failed %s: %s; attempting requests fallback', url, e)
                     try:
