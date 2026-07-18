@@ -56,6 +56,25 @@ def transfer_cookies_to_requests(context, session: requests.Session):
         session.cookies.set(c['name'], c['value'], domain=c.get('domain'))
 
 
+def trigger_audio_playback(page):
+    try:
+        page.evaluate('''() => {
+            const audios = Array.from(document.querySelectorAll('audio'));
+            if (audios.length) {
+                audios.forEach(a => { a.muted = true; a.play().catch(() => {}); });
+                return true;
+            }
+            const btn = Array.from(document.querySelectorAll('button, a')).find(el => /재생|play/i.test(el.textContent));
+            if (btn) {
+                btn.click();
+                return true;
+            }
+            return false;
+        }''')
+    except Exception:
+        pass
+
+
 def attempt_login(page):
     # Try common login pages or detect login form
     # If credentials not provided, skip
@@ -241,8 +260,12 @@ def main():
                 page.goto(target, wait_until='networkidle', timeout=20000)
                 # trigger audio playback to force browser fetch of the actual m4a resource
                 try:
-                    page.evaluate('() => Array.from(document.querySelectorAll("audio")).forEach(a => a.play().catch(() => {}))')
-                    page.wait_for_timeout(4000)
+                    trigger_audio_playback(page)
+                    page.wait_for_timeout(6000)
+                    try:
+                        page.wait_for_response(lambda r: '.m4a' in r.url and r.status in (200, 206), timeout=10000)
+                    except Exception:
+                        pass
                 except Exception:
                     pass
                 # collect from responses (audio files may be fetched dynamically)
