@@ -406,13 +406,17 @@ def main():
             if downloaded:
                 logger.info('Using %d complete audio files for today (%s)', len(downloaded), today_str)
 
-            for item in to_download:
-                if downloaded:
-                    break
-                url = item['url'].strip("'\"")
-                referer = item.get('referer') or 'https://5dang.ebs.co.kr/'
-                fname = url.split('/')[-1].split('?')[0]
-                dest = tdpath / fname
+            if len(downloaded) < len(to_download):
+                for item in to_download:
+                    url = item['url'].strip("'\"")
+                    referer = item.get('referer') or 'https://5dang.ebs.co.kr/'
+                    fname = url.split('/')[-1].split('?')[0]
+                    dest = tdpath / fname
+
+                    # Skip downloading if we already have it in downloaded list
+                    if any(f.name == fname for f in downloaded):
+                        logger.info('File %s already exists in downloaded list, skipping', fname)
+                        continue
                 # Define headers for fallback requests
                 try:
                     ua = page.evaluate('() => navigator.userAgent')
