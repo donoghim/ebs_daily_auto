@@ -21,6 +21,10 @@ EBS_USERNAME = os.environ.get('EBS_USERNAME')
 EBS_PASSWORD = os.environ.get('EBS_PASSWORD')
 GCP_SA_KEY = os.environ.get('GCP_SA_KEY')
 GDRIVE_FOLDER_ID = os.environ.get('GDRIVE_FOLDER_ID')
+DEBUG_PLAYWRIGHT = os.environ.get('DEBUG_PLAYWRIGHT')
+DEBUG_SLOWMO = os.environ.get('DEBUG_SLOWMO')
+SKIP_UPLOAD = os.environ.get('SKIP_UPLOAD')
+DEBUG_FORCE_LOGIN = os.environ.get('DEBUG_FORCE_LOGIN')
 
 KST = timezone(timedelta(hours=9))
 
@@ -76,86 +80,110 @@ def trigger_audio_playback(page):
 
 
 def attempt_login(page):
-    # Try common login pages or detect login form
     # If credentials not provided, skip
     if not (EBS_USERNAME and EBS_PASSWORD):
         logger.warning('No EBS credentials provided; cannot login via Playwright.')
-        return
+        return False
 
-    # Try visiting a known login URL first
+    logger.info('===== AUTOMATIC LOGIN ATTEMPT =====')
+    logger.info('Username: %s', EBS_USERNAME)
+
+    # Try visiting login URLs
     login_urls = [
-        'https://user.ebs.co.kr/login.do',
-        'https://user.ebs.co.kr/login',
-        'https://member.ebs.co.kr/login',
+        'https://5dang.ebs.co.kr/login',
     ]
+    
     for lu in login_urls:
         try:
+            logger.info('Navigating to: %s', lu)
             page.goto(lu, wait_until='domcontentloaded', timeout=15000)
-        except Exception:
-            continue
-
-        # try common selectors
-        username_selectors = ['input[name="userId"]', 'input[name="username"]', 'input[type="text"]', 'input[id*=id]']
-        password_selectors = ['input[name="password"]', 'input[type="password"]', 'input[id*=pw]']
-
-        uname = None
-        pwd = None
-        for s in username_selectors:
-            try:
-                if page.query_selector(s):
-                    uname = s
-                    break
-            except Exception:
-                continue
-        for s in password_selectors:
-            try:
-                if page.query_selector(s):
-                    pwd = s
-                    break
-            except Exception:
-                continue
-
-        if uname and pwd:
-            try:
-                page.fill(uname, EBS_USERNAME)
-                page.fill(pwd, EBS_PASSWORD)
-                # try pressing Enter
-                page.keyboard.press('Enter')
-                page.wait_for_timeout(3000)
-                logger.info('Submitted login form on %s', lu)
-                # Recover to AUSCHOOL after successful attempt
+            logger.info('Page loaded: %s', page.url)
+            page.wait_for_timeout(2000)  # Give page time to render
+            
+            # Try to find and fill username field
+            username_field = None
+            for selector in ['input[name="userId"]', 'input[name="username"]', 'input[type="text"]']:
                 try:
-                    page.goto(AUSCHOOL_URL, wait_until='domcontentloaded', timeout=15000)
+                    elem = page.query_selector(selector)
+                    if elem:
+                        username_field = selector
+                        logger.info('Found username field: %s', selector)
+                        break
                 except Exception:
                     pass
-                return
-            except Exception:
+            
+            if not username_field:
+                logger.warning('Username field not found on %s, trying next login URL', lu)
                 continue
-
-    # Fallback: navigate to AUSCHOOL and look for login modal/button
-    try:
-        page.goto(AUSCHOOL_URL, wait_until='domcontentloaded', timeout=15000)
-        # if there is a button/link with '로그인'
-        btn = page.query_selector('text=로그인')
-        if btn:
-            btn.click()
-            page.wait_for_timeout(2000)
-            # attempt generic fills
-            for s in ['input[type="text"]', 'input[type="email"]', 'input[name*=id]']:
-                el = page.query_selector(s)
-                if el:
-                    el.fill(EBS_USERNAME)
-                    break
-            for s in ['input[type="password"]']:
-                el = page.query_selector(s)
-                if el:
-                    el.fill(EBS_PASSWORD)
-                    break
-            page.keyboard.press('Enter')
+            
+            # Try to find and fill password field
+            password_field = None
+            for selector in ['input[name="password"]', 'input[type="password"]']:
+                try:
+                    elem = page.query_selector(selector)
+                    if elem:
+                        password_field = selector
+                        logger.info('Found password field: %s', selector)
+                        break
+                except Exception:
+                    pass
+            
+            if not password_field:
+                logger.warning('Password field not found on %s, trying next login URL', lu)
+                continue
+            
+            # Fill in credentials
+            logger.info('Filling username field...')
+            page.fill(username_field, EBS_USERNAME)
+            page.wait_for_timeout(500)
+            
+            logger.info('Filling password field...')
+            page.fill(password_field, EBS_PASSWORD)
+            page.wait_for_timeout(500)
+            
+            # Try to find and click login button
+            login_button = None
+            button_selectors = ['button:has-text("로그인")', 'button[type="submit"]', 'input[type="submit"]']
+            
+            for selector in button_selectors:
+                try:
+                    elem = page.query_selector(selector)
+                    if elem:
+                        login_button = selector
+                        logger.info('Found login button: %s', selector)
+                        break
+                except Exception:
+                    pass
+            
+            if login_button:
+                logger.info('Clicking login button...')
+                page.click(login_button)
+            else:
+                logger.info('No login button found, pressing Enter...')
+                page.keyboard.press('Enter')
+            
+            # Wait for login to complete
+            logger.info('Waiting for login to complete...')
             page.wait_for_timeout(3000)
-            logger.info('Attempted modal login')
-    except Exception:
-        logger.debug('Fallback login attempt failed')
+            
+            # Check if login was successful by verifying URL changed or page loaded
+            current_url = page.url
+            logger.info('Current URL after login attempt: %s', current_url)
+            
+            # If we're still on login page, login probably failed
+            if 'login' in current_url.lower():
+                logger.warning('Still on login page, credentials may be incorrect. Trying next URL...')
+                continue
+            
+            logger.info('===== LOGIN SUCCESSFUL =====')
+            return True
+            
+        except Exception as e:
+            logger.error('Error during login attempt for %s: %s', lu, e)
+            continue
+    
+    logger.error('===== LOGIN FAILED - NO VALID LOGIN URL WORKED =====')
+    return False
     
     # Final recovery: ensure we're on AUSCHOOL_URL and wait for stable state
     try:
@@ -191,10 +219,32 @@ def main():
             pass
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # support DEBUG_PLAYWRIGHT for headful debugging locally
+        if DEBUG_PLAYWRIGHT and DEBUG_PLAYWRIGHT.lower() not in ('0', 'false', 'no'):
+            try:
+                sm = int(DEBUG_SLOWMO) if DEBUG_SLOWMO else 150
+            except Exception:
+                sm = 150
+            browser = p.chromium.launch(headless=False, slow_mo=sm)
+        else:
+            browser = p.chromium.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
         page.on('response', on_response)
+
+        # If credentials provided, perform an initial login on the EBS login page
+        if EBS_USERNAME and EBS_PASSWORD:
+            logger.info('===== LOGIN FLOW START (credentials provided) =====')
+            login_success = attempt_login(page)
+            logger.info('===== LOGIN FLOW END =====')
+            if not login_success:
+                logger.warning('Login failed, but continuing to AUSCHOOL_URL anyway')
+            try:
+                page.wait_for_load_state('networkidle', timeout=5000)
+            except Exception:
+                pass
+        else:
+            logger.info('No credentials provided - skipping login flow, proceeding directly to AUSCHOOL_URL')
 
         # Go to target (try load; continue even if non-fatal errors)
         try:
@@ -415,8 +465,12 @@ def main():
                 logger.error('No files downloaded')
                 sys.exit(3)
 
+            if SKIP_UPLOAD and SKIP_UPLOAD.lower() not in ('0', 'false', 'no'):
+                logger.info('SKIP_UPLOAD is set; skipping upload step')
+                return
+
             if not GCP_SA_KEY or not GDRIVE_FOLDER_ID:
-                logger.error('GCP_SA_KEY or GDRIVE_FOLDER_ID not set; skipping upload');
+                logger.error('GCP_SA_KEY or GDRIVE_FOLDER_ID not set; skipping upload')
                 return
 
             try:
