@@ -1,0 +1,586 @@
+<!DOCTYPE html><html class="no-js" lang="ko"><!--<![endif]--><head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+	<meta property="og:title" content="전 국민의 평생학교 EBS">
+	<meta name="description" content="EBS 교육방송">
+	<meta property="og:image" content="https://m.ebs.co.kr/common/img/ebs_logo.png">
+	<meta name="robots" content="noai, noimageai">
+	<title>로그인 | 전 국민의 평생학교 EBS</title>
+	<link rel="shortcut icon" type="image/x-icon" href="https://static.ebs.co.kr/images/bhp/favicon.ico">
+	<link type="text/css" rel="stylesheet" href="/common/css/respond/common2016.css?v=20200826">
+	<!-- <link type="text/css" rel="stylesheet" href="/common/css/respond/m_menucommon.css"> --><!-- 2024-02-23 -->
+	<!-- 2024-02-23 -->
+	<link type="text/css" rel="stylesheet" href="/common/css/core/login.css?v=20200826">
+	<script type="text/javascript" src="https://5dang.ebs.co.kr/common/js/wlo.js"></script><script>
+	<!--	
+			
+			//alert('로그인이 필요합니다.');
+		
+	//-->
+	</script>
+	<script type="text/javascript" src="/common/js/respond/ebs.respond.common.js?v=20171025"></script>
+	<script type="text/javascript" src="/common/js/lib/jquery-latest.min.js?v=20171025"></script>
+	<script type="text/javascript" src="/common/js/common.js?v=20171025"></script>
+	<link type="text/css" rel="stylesheet" href="/common/css/search/owl.carousel.min.css?v=20180508"><!-- 모바일메뉴 -->
+	<script type="text/javascript" src="/common/js/owl.carousel.js"></script><!-- 모바일메뉴 -->
+	<link type="text/css" rel="stylesheet" href="/common/css/m_menu.css"><!-- 모바일메뉴 -->
+	<script type="text/javascript" src="/common/js/m_menu.js?v=13"></script><!-- 모바일메뉴 -->			
+<script>
+	var loginStatus;
+	</script>
+<script type="text/javascript" src="//wcs.naver.net/wcslog.js"> </script><script type="text/javascript" async="" src="https://ssl.pstatic.net/melona/libs/gfp-nac-module/synchronizer.js"></script> 
+<script type="text/javascript"> 
+	if (!wcs_add) var wcs_add={};
+	wcs_add["wa"] = "s_24868b5c33e6";
+	if (!_nasa) var _nasa={};
+	wcs.inflow('ebs.co.kr');
+	wcs_do(_nasa);
+</script>
+
+<script type="text/javascript">
+
+/*
+ * 로컬모드에 따라 회원가입/수정/탈퇴 링크 블럭처리.
+ */	
+function _localmodeChk(command) { 
+	if(_isLocalMode()) {
+		alert('서비스 일시 중지중입니다.\n긴급 네트워크 증설 및 보안 개선 작업으로 인해\n현재 신규 회원가입과 회원정보수정/탈퇴 기능이 잠시 중단됩니다.\n \n작업이 완료되는 즉시 서비스 될 수 있도록 하겠습니다.');
+	} else {
+		if(command == 'join') {
+			var eventReturn="";
+			var indexNb = eventReturn.indexOf('?NaPm')
+			if(indexNb != -1){
+				eventReturn = eventReturn.substr(0,indexNb);
+				}
+			
+			
+			//회원가입시 리다이렉트 처리
+			if(eventReturn.startsWith('https://www.ebs.co.kr/customer/service/event/progressionofevent')){
+				//이벤트
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn;
+										
+			}else if(eventReturn.startsWith('https://5dang.ebs.co.kr/auschool/detail')){
+
+				if('' != ''){
+					eventReturn +="&stepId="	
+					}
+				if('' != ''){
+					eventReturn +="&clsfn_syst_id=&lectId="	
+					}
+				if('' != ''){
+					eventReturn +="&situ="	
+					}
+				
+				//오디어 어학당
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn;
+				
+			}else if(eventReturn.startsWith('https://worldtrip.ebs.co.kr/worldtrip/replayView')){
+				//세상의 모든기행
+
+				if('' != ''){
+					eventReturn +="&courseId="	
+					}
+				if('' != ''){
+					eventReturn +="&stepId="	
+					}
+				if('' != ''){
+					eventReturn +="&lectId="	
+					}
+				
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn;
+			
+			}else if(eventReturn.startsWith('https://classe.ebs.co.kr/classe/detail/show')){
+				if('' != ''){
+					eventReturn +="&lectId="	
+					}
+				if('' != ''){
+					eventReturn +="&clsfn_syst_id="	
+					}
+				
+				
+				// 클래스 e
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn;
+			
+			}else if(eventReturn.startsWith('https://docuprime.ebs.co.kr/docuprime')){
+				//다큐프라임
+				if('' != ''){
+					eventReturn +="&courseId="	
+					}
+				if('' != ''){
+					eventReturn +="&stepId="	
+					}
+				if('' != ''){
+					eventReturn +="&lectId="	
+					}
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn;
+				
+			}else if(eventReturn.startsWith('https://anikids.ebs.co.kr/anikids')){
+				//애니키즈
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn
+				
+			}else if(eventReturn.startsWith('https://5easy.ebs.co.kr/aujisik')){
+				//오디오e지식
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn
+				
+			}/* else if(eventReturn.startsWith('https://jisike.ebs.co.kr/jisike/vodReplayView')){
+				//지식채널e
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl=https://jisike.ebs.co.kr/jisike/vodReplayView?siteCd=&courseId=&stepId=&lectId=";
+				
+			}*/else if(eventReturn.startsWith('https://ebr.ebs.co.kr/ebr')){
+				//비즈니스 리뷰
+				if('' != ''){
+					eventReturn +="&courseId="	
+					}
+				if('' != ''){
+					eventReturn +="&stepId="	
+					}
+				if('' != ''){
+					eventReturn +="&lectId="	
+					} 
+				 
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn;
+				
+			} /*else if(eventReturn.startsWith('https://dbox.ebs.co.kr/dbox/movie/view')){
+				//D-box
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl="+eventReturn
+			
+			}else if(eventReturn.startsWith('https://docuprime.ebs.co.kr/bestdoctors/vodReplayView')){
+				//명의헬스케어
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl=https://docuprime.ebs.co.kr/bestdoctors/vodReplayView?siteCd=&courseId=&stepId=&lectId=";
+				
+			}else if(eventReturn.startsWith('https://literacy.ebs.co.kr/yourliteracy/literacyLecture/vodReplayView')){
+				//당신의 문해력
+				location.href = "https://sso.ebs.co.kr/join/intro?returnUrl=?returnUrl=https://literacy.ebs.co.kr/yourliteracy/literacyLecture/vodReplayView?siteCd=&courseId=&stepId=&lectId=";"
+				
+			}*/ else{
+					location.href = "https://sso.ebs.co.kr/join/intro";
+					}
+			//location.href = 'https://sso.ebs.co.kr/join/intro?returnUrl=https://www.ebs.co.kr/main';
+			
+		} else if(command == 'findId') {
+			//location.href = 'https://sso.ebs.co.kr/user/find/id?returnUrl=https://www.ebs.co.kr/main';
+			location.href = "https://sso.ebs.co.kr/user/find/id";
+		} else if(command == 'findPwd') {
+			//location.href = 'https://sso.ebs.co.kr/user/reissue/password?returnUrl=https://www.ebs.co.kr/main';
+			location.href = "https://sso.ebs.co.kr/user/reissue/password?returnUrl=https://www.ebs.co.kr";
+		}
+	}
+}
+
+/*
+ * 로컬 모드 확인.
+ * sso: false / local: true 
+ */
+function _isLocalMode() {
+	var isLocalMode = false;
+	/*
+	$.ajax({
+		url: '/sso',
+		type: 'GET',
+		async: false,
+		data: 'c=CLM',
+		success: function (data) {
+			if (data == 'Y') {
+				isLocalMode = true;
+			} else if (data == 'L') {
+				isLocalMode = false;
+			} else if (data == 'N') {
+				isLocalMode = false;
+			}
+		},
+		error: function (data) {
+			localMode = false;
+		}
+	});
+	*/
+	return isLocalMode;
+}
+</script>
+
+<script type="text/javascript" async="" src="https://ssl.pstatic.net/melona/libs/gfp-nac-module/synchronizer.js"></script></head>
+<body class="">
+<div id="Document" class="main">
+	<div class="mob_lg">
+		<h1><a href="https://www.ebs.co.kr/main">EBS</a></h1>
+		<h2>로그인</h2>
+	</div>
+	<div class="top_me03"><a href="#nav_drawer">메뉴 열기</a></div>
+	<nav id="nav_drawer" class="new_design nav_drawer mm-menu mm-vertical mm-ismenu mm-current mm-opened">
+	<div class="nav_drawer_top">
+
+ 		<div class="login_info">
+ 			<!-- 뱃지배너 -->
+ 			<p class="first_child">
+						<a href="https://www.ebs.co.kr/login">로그인 후 이용해 주세요 !</a></p>
+				<button type="button"><span>close</span></button>
+		</div><!-- //login_info -->
+
+	</div>
+	<ul class="mm-list">
+		<li class="first_child first_item"><a href="https://www.ebs.co.kr/package/freeticket">방송구독권</a></li>
+		
+	<li class="even_item"><a href="https://www.ebs.co.kr/login?returnUrl=https://www.ebs.co.kr/mypage/order/basket/list&amp;j_returnurl=https://www.ebs.co.kr/mypage/order/basket/list">장바구니</a></li>
+		<li><a href="https://www.ebs.co.kr/login?returnUrl=https://www.ebs.co.kr/mypage/broadcasting/myvod&amp;j_returnurl=https://www.ebs.co.kr/mypage/broadcasting/myvod">구독 정보</a></li>
+		<li class="even_item first_item"><a href="https://www.ebs.co.kr/login?returnUrl=https://www.ebs.co.kr/mypage/mystudy&amp;j_returnurl=https://www.ebs.co.kr/mypage/mystudy">학습 정보</a></li>
+	<li><a href="https://www.ebs.co.kr/customer/service/event/progressionofevent">이벤트</a></li>
+		<li class="even_item"><a href="https://www.ebs.co.kr/voucher/lecture/pkg">평생교육이용권</a></li>
+		<li class="first_item"><a href="https://www.ebs.co.kr/customer/service/notice">서비스공지</a></li>
+		<li class="last_item even_item"><a href="/ai/intro">EBS AI</a></li>		
+	</ul>
+
+	<div class="apply_wrap job">
+		<dl>
+			<dt class="first_term">방송ㆍ구독</dt>
+			<dd class="first_desc">				
+				<ul>
+					<li class="first_child first_item"><a href="https://www.ebs.co.kr/onair?channelCodeString=tv"><span>온에어</span></a></li>
+					<li class="even_item"><a href="https://www.ebs.co.kr/schedule?channelCd=tv&amp;onor=tv"><span>편성표</span></a></li>
+					<li><a href="https://www.ebs.co.kr/tv/home"><span>TV</span></a></li>
+					<li class="even_item first_item"><a href="https://www.ebs.co.kr/radio/home"><span>라디오</span></a></li>
+					<li><a href="https://news.ebs.co.kr/ebsnews"><span>뉴스</span></a></li>
+					<li class="last_item even_item"><a href="https://www.ebs.co.kr/schedule/channelGuide"><span>채널안내</span></a></li><!-- 2025-09-24 -->
+				</ul>
+				<a class="tvFree" href="https://about.ebs.co.kr/kor/tv/fee?tabVal=value" target="_blank">수신료 70원으로 이뤄낸 가치</a>
+				<a class="support" href="https://www.ebs.co.kr/package/support">EBS구독이 후원입니다</a><!-- 2024-08-01 -->
+			</dd>
+			<dt>직업ㆍ학습</dt>
+			<dd class="last_desc">				
+				<ul>
+					<li class="first_child first_item"><a href="https://www.ebs.co.kr/public"><span>공무원</span></a></li>
+					<li class="even_item"><a href="https://www.ebs.co.kr/land"><span>공인중개사</span></a></li>
+					<li><a href="https://www.ebs.co.kr/pass"><span>자격증</span></a></li>
+					<li class="even_item first_item"><a href="https://www.ebs.co.kr/voucher/lecture/pkg"><span>평생교육이용권</span></a></li>
+					<li class="last_item"><a href="https://www.ebs.co.kr/pass/language/toeic/application/comprehensive"><span>외국어/토익</span></a></li>
+				</ul>
+				<a class="b2b_mo" href="https://www.ebs.co.kr/ebsb2b">단체 수강</a><!-- 2026-04-08 -->
+			</dd>
+		</dl>
+	</div>
+
+	<div class="family_site_go">
+		<strong>패밀리사이트 바로가기</strong>
+		<div class="owl-carousel sBox o_owl owl-loaded owl-drag">
+			<!-- <div class="item">
+				<div class="">
+					<a href="https://on.ebs.co.kr/main.ebs" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img01.png" width="43" alt=""><span>초등ON</span></a>
+				</div>
+			</div> -->
+			
+			
+			
+			
+			
+			
+		<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all; width: 523px; padding-left: 25px; padding-right: 25px;"><div class="owl-item active" style="width: 73.75px; margin-right: 5px;"><div class="item">
+				<div class="">
+					<a href="https://primary.ebs.co.kr/main/primary" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img02.png" width="43" alt=""><span>초등</span></a>
+				</div>
+			</div></div><div class="owl-item active" style="width: 73.75px; margin-right: 5px;"><div class="item">
+				<div class="">
+					<a href="https://mid.ebs.co.kr/premium/middle/index" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img03.png" width="43" alt=""><span>중학프리미엄</span></a>
+				</div>
+			</div></div><div class="owl-item active" style="width: 73.75px; margin-right: 5px;"><div class="item">
+				<div class="">
+					<a href="https://www.ebsi.co.kr/" target="_blank" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img04.png" width="43" alt=""><span>고교 EBSi</span></a>
+				</div>
+			</div></div><div class="owl-item active" style="width: 73.75px; margin-right: 5px;"><div class="item">
+				<div class="">
+					<a href="https://www.ebse.co.kr/" target="_blank" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img05.png" width="43" alt=""><span>EBSe</span></a>
+				</div>
+			</div></div><div class="owl-item" style="width: 73.75px; margin-right: 5px;"><div class="item">
+				<div class="">
+					<a href="https://www.ebsmath.co.kr/" target="_blank" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img06.png" width="43" alt=""><span>EBS MATh</span></a>
+				</div>
+			</div></div><div class="owl-item" style="width: 73.75px; margin-right: 5px;"><div class="item">
+				<div class="">
+					<a href="https://www.ebssw.kr/" target="_blank" class=""><img src="https://static.ebs.co.kr/www/common/images/family_img07.png" width="43" alt=""><span>이솦</span></a>
+				</div>
+			</div></div></div></div><div class="owl-nav disabled"><button type="button" role="presentation" class="owl-prev"><span aria-label="Previous">‹</span></button><button type="button" role="presentation" class="owl-next"><span aria-label="Next">›</span></button></div><div class="owl-dots disabled"></div></div>
+
+	</div>
+	<div class="info_ebs">
+		<ul>
+			<li class="first_child first_item"><a href="https://about.ebs.co.kr/kor/main/index">EBS소개</a></li>
+			<li class="even_item"><a href="https://www.ebs.co.kr/free?mainTop">장애인서비스</a></li>
+			<li class="last_item"><a href="https://www.ebs.co.kr/customer?mainTop">고객센터</a></li>
+		</ul>
+	</div>
+</nav>
+<div class="dim" style=""></div>
+
+
+<script type="text/javascript">
+function modUser(type) {
+	if (type == 'U') {
+		$('#modFrm').attr('action', 'https://sso.ebs.co.kr/user/auth');
+		$('#modFrm').attr('target', '_blank');
+		$('#userId').val('');
+		$('#modFrm').submit();
+	} else if (type == 'D') {
+		$('#modFrm').attr('action', 'https://sso.ebs.co.kr/secession/auth');
+		$('#modFrm').attr('target', '_self');
+		$('#userId').val('');
+		$('#returnUrl').val('https://5dang.ebs.co.kr/auschool/sub/language?clsfnSystId1=47140032%3E47140033');
+		$('#modFrm').submit();
+	}
+}
+</script>
+<div id="login_area">
+		<div class="lg_top">
+			<div class="title">
+				<h1><a href="https://www.ebs.co.kr/main">EBS</a></h1>
+				<h2>로그인</h2>
+			</div>
+				<div class="top_bnr">
+					<a href="https://about.ebs.co.kr/kor/tv/fee?tabVal=ebs" class="hitUpdateContentsShow" data-cntsshwtoryid="537" data-mngsno="1">
+							<img src="https://static.ebs.co.kr/images/public/2020/11/25/13/20/20/54b1b710-e966-4936-8ff5-7de32dc0ebb8.jpg" alt="수신료의 가치">
+						</a>
+					</div>
+			<!-- 로고변경 -->
+			<!-- 로고변경 -->
+		</div>
+		<!-- 2020 리뉴얼 -->
+                <div class="bnr_sub">
+					<!-- 2020-11-19 -->
+					<a href="https://www.ebs.co.kr/customer/service/event/progressionofevent/1354589277481" class="hitUpdateContentsShow" data-cntsshwtoryid="538" data-mngsno="132">
+							<img class="pc_block" src="https://static.ebs.co.kr/images/public/2026/06/17/16/37/58/1642b05f-6488-4b70-9d40-4d81ff07ad77.jpg" alt="오디오어학당의 매력을 친구들에게 알려주세요!">
+							<img class="m_block" src="https://static.ebs.co.kr/images/public/2026/06/17/16/37/58/1d2799ac-8930-43a9-be1f-cf77fcf86551.jpg" alt="오디오어학당의 매력을 친구들에게 알려주세요!">
+						</a>
+					<!-- // 2020-11-19 -->
+                </div>
+                <!-- //2020 리뉴얼 -->
+		
+		<div class="login_box login_box_new">
+		<form id="frm" name="frm" method="post" action="/sso/login" autocomplete="off">
+				<input type="hidden" name="returnUrl" value="https://5dang.ebs.co.kr/auschool/sub/language?clsfnSystId1=47140032%3E47140033">
+				<input type="hidden" name="login_uri" value="https://5dang.ebs.co.kr/sso/login">
+				<input type="hidden" name="userId" id="userId">
+				<input type="hidden" name="snsSite" id="snsSite">
+		
+			<p class="login_led">*로그인하실때 ID/PW 대소문자를 구분하여 입력해 주시기 바랍니다.</p><!-- 2020-04-09 -->
+			<div class="left">
+				<fieldset>
+					<legend>로그인 정보 입력</legend>
+					<div class="info_input">
+						<input type="text" id="j_username" name="i" class="id_input txt_type" style="ime-mode:inactive;" title="아이디입력" autocomplete="off">
+						<input type="password" id="j_password" name="c" class="pw_input txt_type" title="비밀번호" onkeyup="checkCapsLock(event)"><!-- placeholder 추가 2020-01-28 -->
+						<input type="hidden" id="j_logintype" name="j_logintype">
+						<button class="img_type" onclick="_login(); return false;">로그인</button>
+					</div>
+				</fieldset>
+				<div class="save">
+					<div class="radiosty">
+								<input type="checkbox" id="rememberMe" name="r" class="cbr_type"><span></span>
+							</div> 
+							<label for="rememberMe">로그인 상태 유지</label>
+						</div>
+				<div class="btn_sns">
+					<div class="lg_sns_tit">SNS 로그인</div>
+					<div class="lg_sns_list">
+						<ul>
+							<li class="lg_sns01 first_child first_item"><a href="#this" onclick="_snsLogin('naver'); return false;">네이버 계정 로그인</a></li>
+							<li class="lg_sns02 even_item"><a href="#this" onclick="_snsLogin('facebook'); return false;">페이스북 계정 로그인</a></li>
+								<li class="lg_sns03"><a href="#none" onclick="_snsLogin('kakao'); return false;">카카오 계정 로그인</a></li>
+							<li class="lg_sns04 even_item first_item"><a href="#none" onclick="_snsLogin('apple'); return false;">애플 계정 로그인</a></li>
+							<li class="lg_sns05 last_item"><a href="#none" onclick="_snsLogin('google'); return false;">구글 로그인</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="right">
+				<div>
+                    <iframe width="280" height="193" id="" class="adBanner_07YR" src="//ad.ad4989.co.kr/cgi-bin/PelicanC.dll?impr?pageid=07YR&amp;out=iframe" allowtransparency="true" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" title="광고배너"></iframe>
+	</div>
+			</div>
+			<div class="clr"></div>
+			<div class="box_bottom">
+				<p class="first_child">한번의 가입으로 <span>EBS</span>와 <span>EBS 패밀리 사이트</span>의 서비스를편리하게 이용하실 수 있습니다.</p>
+				<ul class="bul_list">
+					<li class="first_child first_item"><a href="#" onclick="javascript:_localmodeChk('join');" class="join_bg">회원가입</a></li>
+					<li class="even_item"><a href="#" onclick="javascript:_localmodeChk('findId');">아이디찾기</a></li>
+					<li class="last_item"><a href="#" onclick="javascript:_localmodeChk('findPwd');">비밀번호 찾기</a></li>
+				</ul>
+			</div>
+		</form>
+		<!-- 2021-07-22 Caps Lock -->
+		<style type="text/css">
+		.capstip { pointer-events: none; position: absolute; left:0; bottom:-25px;z-index:1; }
+		.capstip span { display: inline-block; padding:10px 15px; color: #fff; background: #d5699e; background: rgba(213, 105, 158, .9); border-radius: 5px; font-size:14px; }
+		.capstip:after { content: ''; position: absolute; top:-7px; left:10px; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 7px solid #d5699e; opacity:.8; }
+		@media all and  (max-width: 979px) {
+			.capstip {display:none;}
+		}
+		.login_box_new {overflow:visible}
+		.radiosty {position:absolute; width: 20px; height: 20px; background: #fcfff4; border-radius: 100%; background:#b5b5b5;}
+		.radiosty span {width: 18px; height: 18px; position: absolute; top: 1px; left: 1px; cursor: pointer; background:#FFF; border-radius: 100%;transition: all .3s ease-in-out}
+		.radiosty span:after {content: ''; width:8px; height:4px; position: absolute; top:5px; left:4px; border:3px solid #FFF; border-top: none; border-right: none; background: transparent; opacity: 0; transform: rotate(-45deg) scale(0);transition: all .3s cubic-bezier(.47,1.64,.41,.8);}
+		.radiosty input[type=checkbox]:checked + span {background:#558fcf;}
+		.radiosty input[type=checkbox]:checked + span:after {opacity:1; transform: rotate(-45deg) scale(1);}
+		.autoTooltip {position: absolute; left:-7px; top:25px;z-index:1; transition: all .7s ease-in-out; width:195px}
+		.autoTooltip span {display: inline-block; padding:10px 10px; color: #fff; background: #d5699e; background: rgba(213, 105, 158, .9); border-radius: 5px; font-size:11px; font-family:'돋움'; font-weight:normal;}
+		.autoTooltip span i {font-size:12px; font-style:normal;}
+		.autoTooltip span a {display:block; color: #fff; font-size:11px; font-family:'돋움'; text-decoration:underline; padding-top:4px; width:70px;}
+		.autoTooltip:after {content: ''; position: absolute; top:-7px; left:10px; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 7px solid #d5699e; opacity:.8; }
+		</style>
+		<script type="text/javascript">
+			document.msCapsLockWarningOff = true;
+			var inhtml = '';
+			inhtml = '<div class="capstip"><span>Caps Lock이 켜져 있습니다.</span></div>';
+			function checkCapsLock(event)  {
+				if (event && typeof event.getModifierState === 'function' && event.getModifierState("CapsLock")) {
+					$('.info_input').append(inhtml);
+						setTimeout(function(){
+						$('.capstip').fadeOut(300, function(){$(this).remove();});
+					}, 700);
+				}
+			}
+		
+		var delta = 5000;
+		var timer = null;
+		$('input:checkbox[id="rememberMe"]').on('click', function(){
+			var com = $('input:checkbox[id="rememberMe"]').is(":checked");
+			if(com){
+				innerhtml = '<div class="autoTooltip"><span><i>※</i> 본 항목에 체크 후 로그인 <br>하신 EBS 사이트에 한하여, <br>로그인 상태가 유지됩니다.</span></div>';
+				$('.save').append(innerhtml);
+				toolremove()
+			} else {
+				$('.autoTooltip').remove();
+			}
+		});
+		var toolremove = function(){
+			clearTimeout( timer );
+			timer = setTimeout(function(){ $('.autoTooltip').remove() }, delta);
+		}
+		</script>
+<!-- //2021-07-22 Caps Lock -->
+
+			
+		</div>
+	</div>
+
+<script type="text/javascript">
+
+	if($.cookie("svi") != null) {
+		$('#id_save').attr('checked', 'checked');
+		$('#j_username').val($.cookie("svi"));
+	}
+	
+	function _login(){
+		
+		if($('#j_username').val() == '' || $('#j_username').val() == '아이디') {
+			alert('아이디를 입력해 주세요.');
+			$('#j_username').val('');
+			$('#j_username').focus();
+			return false;
+		}
+		if($('#j_password').val() == '') {
+			alert('패스워드를 입력해 주세요.');
+			$('#j_password').val('');
+			$('#j_password').focus();
+			return false;
+		}
+		
+		$('#frm').submit();
+	}
+
+	function _snsLogin(snsSite) {
+	    $('#frm').attr('action', '/sso/social/login');
+	    $("#j_username").val('');
+	    $("#j_password").val('');
+	    $("#snsSite").val(snsSite);
+	    $('#frm').submit();
+	}
+
+	function _facebookLogin(siteCd) {
+		// 유저에이전트를 불러와서 OS를 구분합니다.
+		var userAgent = navigator.userAgent.toLowerCase();
+
+		if(userAgent.indexOf("android") > -1){
+			if(siteCd.indexOf("classe") > -1){
+				EbsClasse.requestFacebookLogin();
+			}else{
+				_snsLogin('facebook');
+			}
+		}else{
+			_snsLogin('facebook');
+		}
+	}
+</script>
+	<!-- add - banner 2020-01-28 -->
+	<div class="ad_banner_new">
+		<!-- pc -->
+		<!-- <iframe width="100%" height="110" src="//ad.ad4989.co.kr/cgi-bin/PelicanC.dll?impr?pageid=0Cd8&out=iframe" allowTransparency="true" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" sandbox="allow-same-origin allow-scripts allow-forms allow-top-navigation allow-popups" class="pcfr adBanner_0Cd8"></iframe> -->
+		<iframe width="100%" height="110" id="" class="adBanner_0Cd8 pcfr" src="//ad.ad4989.co.kr/cgi-bin/PelicanC.dll?impr?pageid=0Cd8&amp;out=iframe" allowtransparency="true" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" title="광고배너"></iframe>
+	<!-- mob -->
+		<!-- <iframe width="100%" height="auto" src="//ad.ad4989.co.kr/cgi-bin/PelicanC.dll?impr?pageid=0CdE&out=iframe" allowTransparency="true" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" sandbox="allow-same-origin allow-scripts allow-forms allow-top-navigation allow-popups" class="mobfr adBanner_0CdE" ></iframe> -->
+		<iframe width="100%" height="auto" id="" class="adBanner_0CdE mobfr" src="//ad.ad4989.co.kr/cgi-bin/PelicanC.dll?impr?pageid=0CdE&amp;out=iframe" allowtransparency="true" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" title="광고배너"></iframe>
+	</div>
+	<!-- // add - banner 2020-01-28 -->
+
+	</div>
+
+	<script type="text/javascript" src="/common/js/jquery.form.js"></script>
+<script type="text/javascript" src="/common/js/extra.js"></script>
+<script type="text/javascript" src="/common/js/common.js"></script>
+<script type="text/javascript">
+ctx = '';
+</script>
+
+<!-- 넷스루 전체로그 (데이타 스토리) / 2020.01.02 / EBSM20191211128194 -->
+<script type="text/javascript">
+	(function(){
+		var EBShostname = window.location.host;
+		var EBSparts = EBShostname.split('.')[0];
+		var nl = document.createElement('script');
+		nl.type = 'text/javascript';
+		nl.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + EBShostname + '/common/js/wlo.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(nl, s);
+		var done = false;
+		nl.onload = nl.onreadystatechange = function() {
+			if ( !done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
+				done = true;
+				if (EBSparts == 'yourliteracy'){
+					_n_sid = "literacy.ebs.co.kr";
+				} else if (EBSparts == 'www') {
+					_n_sid = "ebs.co.kr";
+				}else {
+					_n_sid = EBSparts + ".ebs.co.kr";
+				}
+				_n_uid_cookie = "DS_CIF";
+				n_logging();
+				nl.onload = nl.onreadystatechange = null;
+			}}})();
+</script>
+<!-- //넷스루 클릭 조회 수  확인용 (조회 확인용 메인페이지만 적용) / 2020.01.02 / EBSM20191211128194 -->
+
+<!-- 카카오먼트 스크립트 시작 / 2023.05.15 /  EBSM20230512160427 -->
+	<script type="text/javascript" charset="UTF-8" src="//t1.daumcdn.net/adfit/static/kp.js"></script>
+	<script type="text/javascript">
+	      kakaoPixel('5796045570273949620').pageView();
+	      kakaoPixel('2196886758809647769').pageView();//클래스 E 추가
+	</script>
+<!-- 카카오먼트 스크립트 끝 -->
+
+<!-- 공통 적용 스크립트 , 모든 페이지에 노출되도록 설치. 단 전환페이지 설정값보다 항상 하단에 위치해야함 / 2021.12.02 / EBBy20211201148690 --> 
+	<script type="text/javascript" src="//wcs.naver.net/wcslog.js"> </script> 
+	<script type="text/javascript"> 
+		if (!wcs_add) var wcs_add={};
+		wcs_add["wa"] = "s_24868b5c33e6";
+		if (!_nasa) var _nasa={};
+		wcs.inflow('ebs.co.kr');
+		wcs_do(_nasa);
+	</script>
+<!-- //공통 적용 스크립트 , 모든 페이지에 노출되도록 설치. 단 전환페이지 설정값보다 항상 하단에 위치해야함 / 2021.12.02 / EBBy20211201148690 --> 
+
+
+
+
+
+
+
+
+
+</body></html>

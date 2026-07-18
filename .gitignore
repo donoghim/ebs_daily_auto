@@ -1,0 +1,14 @@
+# Ignore debug artifacts
+debug/
+*.har
+har_saved_*.m4a
+# Python artifacts
+__pycache__/
+*.py[cod]
+.env
+.venv
+venv/
+
+# Editor
+.vscode/
+.idea/

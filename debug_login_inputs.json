@@ -1,0 +1,50 @@
+[
+  {
+    "tag": "returnUrl",
+    "name": "returnUrl",
+    "id": null,
+    "type": "hidden"
+  },
+  {
+    "tag": "login_uri",
+    "name": "login_uri",
+    "id": null,
+    "type": "hidden"
+  },
+  {
+    "tag": "userId",
+    "name": "userId",
+    "id": "userId",
+    "type": "hidden"
+  },
+  {
+    "tag": "snsSite",
+    "name": "snsSite",
+    "id": "snsSite",
+    "type": "hidden"
+  },
+  {
+    "tag": "i",
+    "name": "i",
+    "id": "j_username",
+    "type": "text"
+  },
+  {
+    "tag": "c",
+    "name": "c",
+    "id": "j_password",
+    "type": "password"
+  },
+  {
+    "tag": "j_logintype",
+    "name": "j_logintype",
+    "id": "j_logintype",
+    "type": "hidden"
+  },
+  {
+    "tag": "r",
+    "name": "r",
+    "id": "rememberMe",
+    "type": "checkbox"
+  }
+]

@@ -1,0 +1,34 @@
+name: EBS Auto Download
+
+on:
+  schedule:
+    # Run daily at 23:10 UTC (which is 08:10 KST next day)
+    - cron: '10 23 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  download-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Install Playwright browsers
+        run: |
+          python -m playwright install --with-deps
+      - name: Run downloader
+        env:
+          EBS_USERNAME: ${{ secrets.EBS_USERNAME }}
+          EBS_PASSWORD: ${{ secrets.EBS_PASSWORD }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+          AUSCHOOL_URL: ${{ secrets.AUSCHOOL_URL }}
+        run: |
+          # Prefer Playwright-based downloader for sites requiring JS
+          python downloader_playwright.py
