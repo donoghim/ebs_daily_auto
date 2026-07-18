@@ -426,22 +426,15 @@ def main():
                 }
 
                 try:
-                    logger.info('Downloading %s via Browser Native Downloader', url)
-                    with page.expect_download(timeout=60000) as download_info:
-                        page.evaluate('''
-                            (args) => {
-                                const a = document.createElement('a');
-                                a.href = args.url;
-                                a.download = args.fname;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                            }
-                        ''', {'url': url, 'fname': fname})
-                    download = download_info.value
-                    download.save_as(str(dest))
+                    logger.info('Downloading %s via Playwright request', url)
+                    resp = page.request.get(url, headers=headers, timeout=60000)
+                    if resp.status not in (200, 206):
+                        raise Exception(f'{resp.status} {resp.status_text}')
+                    content = resp.body()
+                    with open(dest, 'wb') as f:
+                        f.write(content)
                     downloaded.append(dest)
-                    logger.info('Browser Native Download succeeded for %s', url)
+                    logger.info('Playwright request download succeeded for %s', url)
                 except Exception as e:
                     logger.warning('Playwright download failed %s: %s; attempting requests fallback', url, e)
                     try:
@@ -503,6 +496,11 @@ def main():
                     upload_to_drive(fpath, GDRIVE_FOLDER_ID, GCP_CLIENT_ID, GCP_CLIENT_SECRET, GCP_REFRESH_TOKEN)
                 except Exception as e:
                     logger.error('Upload failed %s: %s', fpath.name, e)
+
+        try:
+            page.remove_listener('response', on_response)
+        except Exception:
+            pass
 
         context.close()
         browser.close()
