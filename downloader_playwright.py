@@ -417,67 +417,67 @@ def main():
                     if any(f.name == fname for f in downloaded):
                         logger.info('File %s already exists in downloaded list, skipping', fname)
                         continue
-                # Define headers for fallback requests
-                try:
-                    ua = page.evaluate('() => navigator.userAgent')
-                except Exception:
-                    ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0 Safari/537.36'
-                headers = {
-                    'Referer': referer,
-                    'User-Agent': ua,
-                    'Range': 'bytes=0-',
-                    'Accept-Encoding': 'identity;q=1, *;q=0',
-                }
-
-                try:
-                    logger.info('Downloading %s via Playwright request', url)
-                    resp = page.request.get(url, headers=headers, timeout=60000)
-                    if resp.status not in (200, 206):
-                        raise Exception(f'{resp.status} {resp.status_text}')
-                    content = resp.body()
-                    with open(dest, 'wb') as f:
-                        f.write(content)
-                    downloaded.append(dest)
-                    logger.info('Playwright request download succeeded for %s', url)
-                except Exception as e:
-                    logger.warning('Playwright download failed %s: %s; attempting requests fallback', url, e)
+                    # Define headers for fallback requests
                     try:
-                        resp = sess.get(url, headers=headers, timeout=60, allow_redirects=True, stream=True)
-                        if resp.status_code not in (200, 206):
-                            raise Exception(f'{resp.status_code} {resp.reason}')
+                        ua = page.evaluate('() => navigator.userAgent')
+                    except Exception:
+                        ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0 Safari/537.36'
+                    headers = {
+                        'Referer': referer,
+                        'User-Agent': ua,
+                        'Range': 'bytes=0-',
+                        'Accept-Encoding': 'identity;q=1, *;q=0',
+                    }
+
+                    try:
+                        logger.info('Downloading %s via Playwright request', url)
+                        resp = page.request.get(url, headers=headers, timeout=60000)
+                        if resp.status not in (200, 206):
+                            raise Exception(f'{resp.status} {resp.status_text}')
+                        content = resp.body()
                         with open(dest, 'wb') as f:
-                            for chunk in resp.iter_content(chunk_size=8192):
-                                if chunk:
-                                    f.write(chunk)
+                            f.write(content)
                         downloaded.append(dest)
-                        logger.info('Fallback download succeeded for %s', url)
-                    except Exception as e2:
-                        logger.error('Download failed %s: %s', url, e2)
-                        # Final fallback: attempt in-page fetch using browser context (sends cookies/credentials)
+                        logger.info('Playwright request download succeeded for %s', url)
+                    except Exception as e:
+                        logger.warning('Playwright download failed %s: %s; attempting requests fallback', url, e)
                         try:
-                            logger.info('Attempting in-page fetch fallback for %s', url)
-                            b64 = page.evaluate(
-                                '''(args) => fetch(args.url, {method:'GET', headers: args.headers, credentials:'include'})
-                                    .then(r => { if(!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.arrayBuffer(); })
-                                    .then(buf => {
-                                        const bytes = new Uint8Array(buf);
-                                        let binary = '';
-                                        const chunk = 0x8000;
-                                        for (let i = 0; i < bytes.length; i += chunk) {
-                                            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-                                        }
-                                        return btoa(binary);
-                                    })''',
-                                {'url': url, 'headers': headers}
-                            )
-                            import base64
-                            content = base64.b64decode(b64)
+                            resp = sess.get(url, headers=headers, timeout=60, allow_redirects=True, stream=True)
+                            if resp.status_code not in (200, 206):
+                                raise Exception(f'{resp.status_code} {resp.reason}')
                             with open(dest, 'wb') as f:
-                                f.write(content)
+                                for chunk in resp.iter_content(chunk_size=8192):
+                                    if chunk:
+                                        f.write(chunk)
                             downloaded.append(dest)
-                            logger.info('In-page fetch succeeded for %s', url)
-                        except Exception as e3:
-                            logger.error('All download attempts failed for %s: %s', url, e3)
+                            logger.info('Fallback download succeeded for %s', url)
+                        except Exception as e2:
+                            logger.error('Download failed %s: %s', url, e2)
+                            # Final fallback: attempt in-page fetch using browser context (sends cookies/credentials)
+                            try:
+                                logger.info('Attempting in-page fetch fallback for %s', url)
+                                b64 = page.evaluate(
+                                    '''(args) => fetch(args.url, {method:'GET', headers: args.headers, credentials:'include'})
+                                        .then(r => { if(!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.arrayBuffer(); })
+                                        .then(buf => {
+                                            const bytes = new Uint8Array(buf);
+                                            let binary = '';
+                                            const chunk = 0x8000;
+                                            for (let i = 0; i < bytes.length; i += chunk) {
+                                                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+                                            }
+                                            return btoa(binary);
+                                        })''',
+                                    {'url': url, 'headers': headers}
+                                )
+                                import base64
+                                content = base64.b64decode(b64)
+                                with open(dest, 'wb') as f:
+                                    f.write(content)
+                                downloaded.append(dest)
+                                logger.info('In-page fetch succeeded for %s', url)
+                            except Exception as e3:
+                                logger.error('All download attempts failed for %s: %s', url, e3)
 
             if not downloaded:
                 logger.error('No files downloaded')
