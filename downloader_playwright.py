@@ -206,7 +206,7 @@ def main():
         try:
             req = response.request
             if '.m4a' in req.url or 'ebs' in req.url:
-                if '.m4a' in req.url and response.status in (200, 206):
+                if '.m4a' in req.url and 'end=180' not in req.url and response.status in (200, 206):
                     try:
                         body = response.body()
                     except Exception:
@@ -326,14 +326,14 @@ def main():
                 for a in page.query_selector_all('a[href]'):
                     try:
                         ah = a.get_attribute('href')
-                        if ah and '.m4a' in ah and not any(x['url']==requests.compat.urljoin(page.url, ah) for x in links):
+                        if ah and '.m4a' in ah and 'end=180' not in ah and not any(x['url']==requests.compat.urljoin(page.url, ah) for x in links):
                             links.append({'url': requests.compat.urljoin(page.url, ah), 'referer': page.url})
                     except Exception:
                         pass
                 for src in page.query_selector_all('audio source, source'):
                     try:
                         s = src.get_attribute('src')
-                        if s and '.m4a' in s and not any(x['url']==requests.compat.urljoin(page.url, s) for x in links):
+                        if s and '.m4a' in s and 'end=180' not in s and not any(x['url']==requests.compat.urljoin(page.url, s) for x in links):
                             links.append({'url': requests.compat.urljoin(page.url, s), 'referer': page.url})
                     except Exception:
                         pass
@@ -343,7 +343,7 @@ def main():
                         txt = sc.inner_text()
                         if '.m4a' in txt:
                             for m in re.findall(r'https?://[^"\'\s]+\.m4a[^"\s]*', txt):
-                                if not any(x['url']==m for x in links):
+                                if 'end=180' not in m and not any(x['url']==m for x in links):
                                     links.append({'url': m, 'referer': page.url})
                     except Exception:
                         pass
@@ -395,9 +395,16 @@ def main():
                 else:
                     logger.info('Skipping audio file (not today): %s', fname)
 
-            downloaded = list(filtered_audio)
+            downloaded = []
+            for fpath in filtered_audio:
+                if fpath.exists() and fpath.stat().st_size > 3 * 1024 * 1024:
+                    downloaded.append(fpath)
+                    logger.info('Selected complete audio file: %s (%d bytes)', fpath.name, fpath.stat().st_size)
+                else:
+                    logger.info('Discarding incomplete/short audio file: %s', fpath.name)
+
             if downloaded:
-                logger.info('Using %d audio files for today (%s)', len(downloaded), today_str)
+                logger.info('Using %d complete audio files for today (%s)', len(downloaded), today_str)
 
             for item in to_download:
                 if downloaded:
