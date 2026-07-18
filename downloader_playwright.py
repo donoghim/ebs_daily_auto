@@ -192,6 +192,31 @@ def attempt_login(page):
         pass
 
 
+def get_custom_filename(orig_name: str) -> str:
+    name_clean = orig_name
+    if name_clean.startswith('har_saved_'):
+        name_clean = name_clean[len('har_saved_'):]
+        
+    parts = name_clean.split('_')
+    if len(parts) >= 2:
+        date_part = parts[0]
+        time_part = parts[1]
+        
+        if time_part.startswith('0700'):
+            keyword = '스타트'
+        elif time_part.startswith('0720'):
+            keyword = '이지'
+        elif time_part.startswith('0740'):
+            keyword = '파워'
+        else:
+            keyword = None
+            
+        if keyword:
+            return f"{date_part}_{time_part}_{keyword}.m4a"
+            
+    return name_clean
+
+
 def main():
     if not is_allowed_weekday_kst():
         logger.info('Today is Sunday in KST -> skipping (Mon-Sat only).')
@@ -398,8 +423,17 @@ def main():
             downloaded = []
             for fpath in filtered_audio:
                 if fpath.exists() and fpath.stat().st_size > 3 * 1024 * 1024:
-                    downloaded.append(fpath)
-                    logger.info('Selected complete audio file: %s (%d bytes)', fpath.name, fpath.stat().st_size)
+                    new_name = get_custom_filename(fpath.name)
+                    new_path = fpath.parent / new_name
+                    try:
+                        if new_path.exists():
+                            new_path.unlink()
+                        fpath.rename(new_path)
+                        downloaded.append(new_path)
+                        logger.info('Selected complete audio file and renamed to: %s (%d bytes)', new_name, new_path.stat().st_size)
+                    except Exception as e:
+                        downloaded.append(fpath)
+                        logger.warning('Failed to rename %s to %s: %s', fpath.name, new_name, e)
                 else:
                     logger.info('Discarding incomplete/short audio file: %s', fpath.name)
 
@@ -410,12 +444,14 @@ def main():
                 for item in to_download:
                     url = item['url'].strip("'\"")
                     referer = item.get('referer') or 'https://5dang.ebs.co.kr/'
-                    fname = url.split('/')[-1].split('?')[0]
-                    dest = tdpath / fname
+                    orig_fname = url.split('/')[-1].split('?')[0]
+
+                    new_fname = get_custom_filename(orig_fname)
+                    dest = tdpath / new_fname
 
                     # Skip downloading if we already have it in downloaded list
-                    if any(f.name == fname for f in downloaded):
-                        logger.info('File %s already exists in downloaded list, skipping', fname)
+                    if any(f.name == new_fname for f in downloaded):
+                        logger.info('File %s already exists in downloaded list, skipping', new_fname)
                         continue
                     # Define headers for fallback requests
                     try:
