@@ -98,18 +98,47 @@ def download_file(session: requests.Session, url: str, dest: pathlib.Path):
 
 def upload_to_drive(filepath: pathlib.Path, folder_id: str, credentials_json: dict):
     scopes = ['https://www.googleapis.com/auth/drive.file']
-    credentials = service_account.Credentials.from_service_account_info(credentials_json, scopes=scopes)
-    service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
+    # extract client email (for helpful logging)
+    client_email = credentials_json.get('client_email') if isinstance(credentials_json, dict) else None
+    try:
+        credentials = service_account.Credentials.from_service_account_info(credentials_json, scopes=scopes)
+        service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
+    except Exception as e:
+        logger.error('Failed to build Drive service: %s', e)
+        raise
 
-    file_metadata = {
-        'name': filepath.name,
-        'parents': [folder_id] if folder_id else None,
-    }
+    file_metadata = {'name': filepath.name}
+    if folder_id:
+        file_metadata['parents'] = [folder_id]
+
     media = MediaFileUpload(str(filepath), mimetype='audio/m4a')
-    logger.info('Uploading %s to Drive folder %s', filepath.name, folder_id)
-    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    logger.info('Uploaded file id: %s', file.get('id'))
-    return file.get('id')
+
+    # mask client email for logs
+    masked_email = None
+    if client_email:
+        try:
+            local, domain = client_email.split('@', 1)
+            masked_email = f"{local[0]}***@{domain}"
+        except Exception:
+            masked_email = '***'
+
+    logger.info('Uploading %s to Drive folder %s (service account: %s)', filepath.name, folder_id, masked_email)
+
+    try:
+        # supportsAllDrives helps when the target is a Shared Drive
+        created = service.files().create(body=file_metadata, media_body=media, fields='id', supportsAllDrives=True).execute()
+        logger.info('Uploaded file id: %s', created.get('id'))
+        return created.get('id')
+    except Exception as e:
+        try:
+            from googleapiclient.errors import HttpError
+            if isinstance(e, HttpError) and getattr(e, 'resp', None) and getattr(e.resp, 'status', None) == 404:
+                logger.error('Upload failed %s: Folder not found or inaccessible. Folder id: %s. Ensure the folder exists and is shared with the service account (%s).', filepath.name, folder_id, masked_email)
+            else:
+                logger.error('Upload failed %s: %s', filepath.name, e)
+        except Exception:
+            logger.error('Upload failed %s: %s', filepath.name, e)
+        raise
 
 
 def main():
