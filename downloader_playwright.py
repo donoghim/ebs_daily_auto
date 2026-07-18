@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 from downloader import upload_to_drive
 
 # Env
-AUSCHOOL_URL = os.environ.get('AUSCHOOL_URL', 'https://5dang.ebs.co.kr/auschool/sub/language?clsfnSystId1=47140032%3E47140033')
+AUSCHOOL_URL = os.environ.get('AUSCHOOL_URL') or 'https://5dang.ebs.co.kr/auschool/sub/language?clsfnSystId1=47140032%3E47140033'
 EBS_USERNAME = os.environ.get('EBS_USERNAME')
 EBS_PASSWORD = os.environ.get('EBS_PASSWORD')
 GCP_SA_KEY = os.environ.get('GCP_SA_KEY')
@@ -140,6 +140,8 @@ def main():
         return
 
     saved_audio_files = []
+
+    logger.info('Using AUSCHOOL_URL: %s', AUSCHOOL_URL)
 
     def on_response(response):
         try:
