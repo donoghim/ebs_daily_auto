@@ -102,10 +102,10 @@ def attempt_login(page):
             
             # Try to find and fill username field
             username_field = None
-            for selector in ['input[name="userId"]', 'input[name="username"]', 'input[type="text"]']:
+            for selector in ['input[name="userId"]:visible', 'input[name="username"]:visible', 'input[type="text"]:visible']:
                 try:
                     elem = page.query_selector(selector)
-                    if elem:
+                    if elem and elem.is_visible():
                         username_field = selector
                         logger.info('Found username field: %s', selector)
                         break
@@ -118,10 +118,10 @@ def attempt_login(page):
             
             # Try to find and fill password field
             password_field = None
-            for selector in ['input[name="password"]', 'input[type="password"]']:
+            for selector in ['input[name="password"]:visible', 'input[type="password"]:visible']:
                 try:
                     elem = page.query_selector(selector)
-                    if elem:
+                    if elem and elem.is_visible():
                         password_field = selector
                         logger.info('Found password field: %s', selector)
                         break
