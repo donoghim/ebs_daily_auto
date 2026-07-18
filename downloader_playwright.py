@@ -198,6 +198,7 @@ def main():
         return
 
     saved_audio_files = []
+    TARGET_PROD_IDS = ['132558', '187', '191']
 
     logger.info('Using AUSCHOOL_URL: %s', AUSCHOOL_URL)
 
@@ -259,7 +260,8 @@ def main():
             try:
                 href = a.get_attribute('href')
                 if href and href not in replay_hrefs:
-                    replay_hrefs.append(href)
+                    if any(f'prodId={pid}' in href for pid in TARGET_PROD_IDS):
+                        replay_hrefs.append(href)
             except Exception:
                 continue
 
@@ -282,7 +284,8 @@ def main():
                     try:
                         href = a.get_attribute('href')
                         if href and href not in replay_hrefs:
-                            replay_hrefs.append(href)
+                            if any(f'prodId={pid}' in href for pid in TARGET_PROD_IDS):
+                                replay_hrefs.append(href)
                     except Exception:
                         continue
             except Exception as e:
