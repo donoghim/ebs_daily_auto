@@ -349,7 +349,19 @@ def main():
                         f.write(content)
                     downloaded.append(dest)
                 except Exception as e:
-                    logger.error('Download failed %s: %s', url, e)
+                    logger.warning('Playwright download failed %s: %s; attempting requests fallback', url, e)
+                    try:
+                        resp = sess.get(url, headers=headers, timeout=60, allow_redirects=True, stream=True)
+                        if resp.status_code not in (200, 206):
+                            raise Exception(f'{resp.status_code} {resp.reason}')
+                        with open(dest, 'wb') as f:
+                            for chunk in resp.iter_content(chunk_size=8192):
+                                if chunk:
+                                    f.write(chunk)
+                        downloaded.append(dest)
+                        logger.info('Fallback download succeeded for %s', url)
+                    except Exception as e2:
+                        logger.error('Download failed %s: %s', url, e2)
 
             if not downloaded:
                 logger.error('No files downloaded')
