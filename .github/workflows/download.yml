@@ -26,7 +26,9 @@ jobs:
         env:
           EBS_USERNAME: ${{ secrets.EBS_USERNAME }}
           EBS_PASSWORD: ${{ secrets.EBS_PASSWORD }}
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
+          GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
+          GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
           AUSCHOOL_URL: ${{ secrets.AUSCHOOL_URL }}
         run: |
