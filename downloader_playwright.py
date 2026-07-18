@@ -362,6 +362,31 @@ def main():
                         logger.info('Fallback download succeeded for %s', url)
                     except Exception as e2:
                         logger.error('Download failed %s: %s', url, e2)
+                        # Final fallback: attempt in-page fetch using browser context (sends cookies/credentials)
+                        try:
+                            logger.info('Attempting in-page fetch fallback for %s', url)
+                            b64 = page.evaluate(
+                                '''(url, headers) => fetch(url, {method:'GET', headers: headers, credentials:'include'})
+                                    .then(r => { if(!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.arrayBuffer(); })
+                                    .then(buf => {
+                                        const bytes = new Uint8Array(buf);
+                                        let binary = '';
+                                        const chunk = 0x8000;
+                                        for (let i = 0; i < bytes.length; i += chunk) {
+                                            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+                                        }
+                                        return btoa(binary);
+                                    })''',
+                                url, headers
+                            )
+                            import base64
+                            content = base64.b64decode(b64)
+                            with open(dest, 'wb') as f:
+                                f.write(content)
+                            downloaded.append(dest)
+                            logger.info('In-page fetch succeeded for %s', url)
+                        except Exception as e3:
+                            logger.error('All download attempts failed for %s: %s', url, e3)
 
             if not downloaded:
                 logger.error('No files downloaded')
